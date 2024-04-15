@@ -8,3 +8,4 @@
 
 
 1. project setup
+2. revisit setup vid
