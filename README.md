@@ -5,3 +5,6 @@
 5. flask tutorial
 6. start mvp proposal
 7. implement a simple websocket app
+
+
+1. project setup
