@@ -10,3 +10,4 @@
 1. project setup
 2. revisit setup vid
 3. flask research 
+4. vid wip
