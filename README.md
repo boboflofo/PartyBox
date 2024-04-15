@@ -9,3 +9,4 @@
 
 1. project setup
 2. revisit setup vid
+3. flask research 
