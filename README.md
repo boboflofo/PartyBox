@@ -13,3 +13,4 @@
 4. vid wip
 
 1. flask tutorial series
+2. flask react integration research
