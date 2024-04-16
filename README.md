@@ -17,3 +17,4 @@
 3. flask react environment setup wip
 4. whiteboarding practice
 5. flask react environment setup wip
+6. set up flask react connection
