@@ -14,3 +14,4 @@
 
 1. flask tutorial series
 2. flask react integration research
+3. flask react environment setup wip
