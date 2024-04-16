@@ -11,3 +11,5 @@
 2. revisit setup vid
 3. flask research 
 4. vid wip
+
+1. flask tutorial series
