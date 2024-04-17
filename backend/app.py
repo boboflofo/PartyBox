@@ -1,7 +1,8 @@
 from flask import Flask, send_from_directory
-import os
+from flask_socketio import SocketIO, join_room
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 # Serve the index.html file for the root URL
 @app.route('/')
@@ -27,5 +28,12 @@ def serve_static(path):
 def serve_manifest():
     return send_from_directory(os.path.join(os.path.dirname(__file__), '..', 'my-react-app', 'build'), 'manifest.json')
 
+@socketio.on('join_room')
+def handle_join_room(data):
+    username = data['username']
+    room_code = data['room_code']
+    join_room(room_code)
+    socketio.emit('user_joined', {'username': username}, room=room_code)
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    socketio.run(app, debug=True)
