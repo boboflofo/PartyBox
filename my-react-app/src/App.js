@@ -1,10 +1,44 @@
-import JoinRoom from "./JoinRoom.js"
-import './App.css';
+import React, { useState } from 'react';
+import JoinRoom from './JoinRoom';
+import HostRoom from './HostRoom';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:5000');
 
 function App() {
+  const [roomId, setRoomId] = useState('');
+
+  const handleJoinRoom = (roomId) => {
+    socket.emit('join_room', { room_id: roomId });
+    socket.on('room_joined', (data) => {
+      setRoomId(data.room_id);
+    });
+    socket.on('room_not_found', () => {
+      alert('Room not found. Please enter a valid room ID.');
+    });
+  };
+
+  const handleHostRoom = () => {
+    socket.emit('host_room');
+    socket.on('room_created', (data) => {
+      setRoomId(data.room_id);
+    });
+  };
+
   return (
     <div className="App">
-      <JoinRoom />
+      <h1>Room-Based Application</h1>
+      {roomId ? (
+        <div>
+          <h2>Room ID: {roomId}</h2>
+          <p>Share this ID with others to join the room.</p>
+        </div>
+      ) : (
+        <div>
+          <JoinRoom onJoin={handleJoinRoom} />
+          <HostRoom onHost={handleHostRoom} />
+        </div>
+      )}
     </div>
   );
 }

@@ -1,28 +1,26 @@
 import React, { useState } from 'react';
-import io from 'socket.io-client';
 
-const JoinRoom = () => {
-    const [username, setUsername] = useState('');
-    const [roomCode, setRoomCode] = useState('');
+export default function JoinRoom({ onJoin }) {
+  const [roomId, setRoomId] = useState('');
 
-    const joinRoom = () => {
-        const socket = io(); // Connect to the websocket server
+  const handleChange = (e) => {
+    setRoomId(e.target.value);
+  };
 
-        socket.emit('join_room', { username, room_code: roomCode });
-        
-        socket.on('user_joined', (data) => {
-            alert(`${data.username} has joined the room.`);
-        });
-    };
+  const handleJoin = () => {
+    onJoin(roomId);
+  };
 
-    return (
-        <div>
-            <h1>Join a Room</h1>
-            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Enter your username" />
-            <input type="text" value={roomCode} onChange={(e) => setRoomCode(e.target.value)} placeholder="Enter room code" />
-            <button onClick={joinRoom}>Join Room</button>
-        </div>
-    );
-};
-
-export default JoinRoom;
+  return (
+    <div>
+      <h2>Join Room</h2>
+      <input
+        type="text"
+        value={roomId}
+        onChange={handleChange}
+        placeholder="Enter Room ID"
+      />
+      <button onClick={handleJoin}>Join</button>
+    </div>
+  );
+}
