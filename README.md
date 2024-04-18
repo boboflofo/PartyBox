@@ -24,4 +24,5 @@
 3. begin websocket room
 4. internship meeting
 
-1. leetcidy
+1. leetcode
+2. wip cors bug
