@@ -1,11 +1,13 @@
-from flask import Flask, send_from_directory, request
+from flask import Flask, send_from_directory
 from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 import os
 import random
 import string
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 # Dictionary to store active rooms
 rooms = {}
@@ -42,6 +44,7 @@ def generate_room_id():
 def host_room():
     room_id = generate_room_id()
     rooms[room_id] = {}
+    print(rooms)
     emit('room_created', {'room_id': room_id})
 
 # SocketIO event to join a room
