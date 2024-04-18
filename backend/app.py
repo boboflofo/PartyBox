@@ -6,7 +6,7 @@ import random
 import string
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+socketio = SocketIO(app,cors_allowed_origins="http://localhost:3000")
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 rooms = {}
