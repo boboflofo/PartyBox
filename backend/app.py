@@ -34,18 +34,25 @@ def serve_manifest():
 def generate_room_id():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
 
+def handle_connect():
+    print('Client connected')
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected')
+
 @socketio.on('host_room')
 def host_room():
     room_id = generate_room_id()
     rooms[room_id] = {}
     print(rooms)
-    emit('room_created', {'room_id': room_id})
+    emit('room_created', {'room_id': room_id}, broadcast=True)
 
 @socketio.on('join_room')
 def join_room(data):
     room_id = data['room_id']
     if room_id in rooms:
-        emit('room_joined', {'room_id': room_id})
+        emit('room_joined', {'room_id': room_id}, broadcast=True)
     else:
         emit('room_not_found')
 
