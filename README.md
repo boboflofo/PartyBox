@@ -30,3 +30,4 @@
 4. tutorial vid
 
 1. leet
+2. bug searchin
