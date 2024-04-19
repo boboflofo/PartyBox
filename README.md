@@ -32,3 +32,4 @@
 1. leet
 2. bug searchin
 3. follow along tutorial
+4. internship work
