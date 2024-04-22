@@ -3,7 +3,7 @@ from flask_socketio import SocketIO, emit
 from flask_cors import CORS
 import os
 import random
-import string
+from string import ascii_uppercase
 
 app = Flask(__name__)
 socketio = SocketIO(app,cors_allowed_origins="http://localhost:3000")
@@ -31,8 +31,16 @@ def serve_static(path):
 def serve_manifest():
     return send_from_directory(os.path.join(os.path.dirname(__file__), '..', 'my-react-app', 'build'), 'manifest.json')
 
-def generate_room_id():
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+def generate_unique_code(length):
+    while True:
+        code = ""
+        for _ in range(length):
+            code += random.choice(ascii_uppercase)
+        
+        if code not in rooms:
+            break
+    
+    return code
 
 def handle_connect():
     print('Client connected')
