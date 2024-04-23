@@ -40,3 +40,5 @@
 3. setup wip
 4. look up express
 5. react flask socket integration
+
+1. leet
