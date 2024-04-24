@@ -1,11 +1,12 @@
-from flask import Flask, send_from_directory
-from flask_socketio import SocketIO, emit
+from flask import Flask, send_from_directory, request, session, redirect
+from flask_socketio import SocketIO, send, leave_room, join_room
 from flask_cors import CORS
 import os
 import random
 from string import ascii_uppercase
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "123456"
 socketio = SocketIO(app,cors_allowed_origins="http://localhost:3000")
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
