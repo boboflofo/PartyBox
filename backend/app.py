@@ -1,5 +1,5 @@
-from flask import Flask, request, jsonify 
-from flask_socketio import SocketIO, emit
+from flask import Flask, send_from_directory, request, session, redirect
+from flask_socketio import SocketIO, send, leave_room, join_room
 from flask_cors import CORS
 import random
 from string import ascii_uppercase
@@ -11,9 +11,10 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 rooms = {}
 
-@app.route('/', methods=["POST", "GET"])
+@app.route('/')
 def serve_react():
     return send_from_directory('..', 'my-react-app/build/index.html')
+
 # @app.route('/static/js/<path:path>')
 # def serve_js(path):
 #     return send_from_directory(os.path.join(os.path.dirname(__file__), '..', 'my-react-app', 'build', 'static', 'js'), path)
