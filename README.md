@@ -52,3 +52,5 @@
 2. cont tutorial
 3. howler?
 4. internship meeting
+
+1. git
