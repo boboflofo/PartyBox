@@ -3,17 +3,7 @@ import JoinRoom from './JoinRoom';
 import HostRoom from './HostRoom';
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:3000', {
-  transports: ['websocket', 'polling'],
-  withCredentials: true,
-  extraHeaders: {
-    'Access-Control-Allow-Origin': 'http://localhost:5000',
-    'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
-    'Access-Control-Allow-Headers': 'Content-Type',
-  },
-});
-
-
+const socket = io.connect('http://localhost:5000')
 
 
 function App() {
