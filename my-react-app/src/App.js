@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import JoinRoom from './JoinRoom';
 import HostRoom from './HostRoom';
@@ -40,6 +39,7 @@ function App() {
       socket.on('room_created', (data) => {
         setRoomId(data.room_id);
         setShowNameInput(false);
+        setPlayers([playerName]); // Add the host to the player list
       });
     } else {
       alert('Please enter your name.');
