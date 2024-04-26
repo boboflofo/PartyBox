@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, request, session, redirect
+from flask import Flask, send_from_directory, request
 from flask_socketio import SocketIO, send, leave_room, join_room, emit
 from flask_cors import CORS
 import random
@@ -34,19 +34,28 @@ def handle_disconnect():
     print('Client disconnected')
 
 @socketio.on('host_room')
-def host_room():
+def host_room(data):
     room_id = generate_unique_code(6)
-    rooms[room_id] = {}
-    print(rooms)
+    player_name = data['player_name']  # Get player name from frontend
+    rooms[room_id] = {request.sid: player_name}
     emit('room_created', {'room_id': room_id}, broadcast=True)
 
 @socketio.on('join_room')
 def join_room(data):
-    room_id = data['room_id']
-    if room_id in rooms:
-        emit('room_joined', {'room_id': room_id}, broadcast=True)
+    if 'room_id' in data and 'player_name' in data:  # Check if both keys are present
+        room_id = data['room_id']
+        player_name = data['player_name']
+        if room_id in rooms:
+            print(f"Room '{room_id}' found.")
+            join_room(room_id)
+            rooms[room_id][request.sid] = player_name
+            print(f"Player '{player_name}' joined room '{room_id}'.")
+            emit('player_joined', {'player_name': player_name}, room=room_id)
+        else:
+            print(f"Room '{room_id}' not found.")
+            emit('room_not_found')
     else:
-        emit('room_not_found')
+        emit('invalid_data')  # Emit an error message if data is incomplete
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
