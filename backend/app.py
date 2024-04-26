@@ -55,8 +55,9 @@ def join_room(data):
         player_name = data['player_name']
         if room_id in rooms:
             rooms[room_id][request.sid] = player_name
-            emit('player_joined', {'players': list(rooms[room_id].values())}, room=room_id)
+            emit('room_players_update', {'room_id': room_id, 'players': list(rooms[room_id].values())}, broadcast=True)  # Emit room_players_update event immediately
             emit('room_joined', {'room_id': room_id})
+            print("Room players updated:", rooms[room_id])  # Print the updated players list
         else:
             emit('room_not_found')
     else:

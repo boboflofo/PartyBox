@@ -13,45 +13,46 @@ function App() {
   const [showNameInput, setShowNameInput] = useState(true);
 
   useEffect(() => {
-    // Function to handle room player updates
     const handleRoomPlayersUpdate = (data) => {
       if (data.room_id === roomId) {
-        setPlayers(data.players);
-        console.log(data.players);
+        const playerNames = Object.values(data.players);
+        setPlayers(playerNames);
       }
     };
   
-    // Emit a request to get player updates for the current room when component mounts
-    socket.emit('get_room_players', roomId);
-  
-    // Listen for room player updates from the server
     socket.on('room_players_update', handleRoomPlayersUpdate);
   
     return () => {
-      // Clean up event listener when component unmounts
       socket.off('room_players_update', handleRoomPlayersUpdate);
     };
-  }, []);
+  }, [roomId]); // Include roomId as a dependency to trigger useEffect on roomId change
+  
+  socket.on('player_joined', (data) => {
+    const playerNames = Object.values(data.players); 
+    setPlayers(playerNames);  
+  });
+
 
   const handleJoinRoom = (roomId) => {
-    if (playerName.trim() !== '') {
-      socket.emit('join_room', { room_id: roomId, player_name: playerName });
-      socket.on('room_joined', (data) => {
-        setRoomId(data.room_id);
-        setShowNameInput(false);
-      });
-      socket.on('player_joined', (data) => {
-        const playerNames = Object.values(data.players); 
-        setPlayers(playerNames);  
-      });
-      socket.on('room_not_found', () => {
-        alert('Room not found. Please enter a valid room ID.');
-      });
-    } else {
-      alert('Please enter your name.');
-    }
-    console.log(players)
-  };
+  if (playerName.trim() !== '') {
+    socket.emit('join_room', { room_id: roomId, player_name: playerName });
+    socket.on('room_joined', (data) => {
+      setRoomId(data.room_id);
+      setShowNameInput(false);
+    });
+    socket.on('player_joined', (data) => {
+      const playerNames = Object.values(data.players); 
+      setPlayers(playerNames);
+      console.log(players)  
+    });
+    socket.on('room_not_found', () => {
+      alert('Room not found. Please enter a valid room ID.');
+    });
+    socket.emit('get_room_players', roomId);
+  } else {
+    alert('Please enter your name.');
+  }
+};
   
   const handleHostRoom = () => {
     if (playerName.trim() !== '') {
