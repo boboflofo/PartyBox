@@ -33,29 +33,37 @@ def handle_connect():
 def handle_disconnect():
     print('Client disconnected')
 
+@socketio.on('get_room_players')
+def get_room_players(room_id):
+    if room_id in rooms:
+        emit('room_players_update', {'room_id': room_id, 'players': list(rooms[room_id].values())})
+    else:
+        emit('room_not_found')
+
 @socketio.on('host_room')
 def host_room(data):
     room_id = generate_unique_code(6)
-    player_name = data['player_name']  # Get player name from frontend
+    player_name = data['player_name']  
     rooms[room_id] = {request.sid: player_name}
     emit('room_created', {'room_id': room_id}, broadcast=True)
+    print(rooms)
 
 @socketio.on('join_room')
 def join_room(data):
-    if 'room_id' in data and 'player_name' in data:  # Check if both keys are present
+    if 'room_id' in data and 'player_name' in data:
         room_id = data['room_id']
         player_name = data['player_name']
         if room_id in rooms:
-            print(f"Room '{room_id}' found.")
-            join_room(room_id)
             rooms[room_id][request.sid] = player_name
-            print(f"Player '{player_name}' joined room '{room_id}'.")
-            emit('player_joined', {'player_name': player_name}, room=room_id)
+            emit('player_joined', {'players': list(rooms[room_id].values())}, room=room_id)
+            emit('room_joined', {'room_id': room_id})
         else:
-            print(f"Room '{room_id}' not found.")
             emit('room_not_found')
     else:
-        emit('invalid_data')  # Emit an error message if data is incomplete
+        emit('invalid_data')
+    print(rooms)
+    
+
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
