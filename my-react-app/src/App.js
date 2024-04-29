@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import JoinRoom from './JoinRoom';
 import HostRoom from './HostRoom';
-import Room from './Room'
+import Room from './Room';
+import TriviaGame from './TriviaGame'; // Import the TriviaGame component
 import io from 'socket.io-client';
 
-const socket = io.connect('http://localhost:5000')
+const socket = io.connect('http://localhost:5000');
 
 function App() {
   const [roomId, setRoomId] = useState('');
@@ -25,34 +26,23 @@ function App() {
     return () => {
       socket.off('room_players_update', handleRoomPlayersUpdate);
     };
-  }, [roomId]); // Include roomId as a dependency to trigger useEffect on roomId change
-  
-  socket.on('player_joined', (data) => {
-    const playerNames = Object.values(data.players); 
-    setPlayers(playerNames);  
-  });
-
+  }, [roomId]);
 
   const handleJoinRoom = (roomId) => {
-  if (playerName.trim() !== '') {
-    socket.emit('join_room', { room_id: roomId, player_name: playerName });
-    socket.on('room_joined', (data) => {
-      setRoomId(data.room_id);
-      setShowNameInput(false);
-    });
-    socket.on('player_joined', (data) => {
-      const playerNames = Object.values(data.players); 
-      setPlayers(playerNames);
-      console.log(players)  
-    });
-    socket.on('room_not_found', () => {
-      alert('Room not found. Please enter a valid room ID.');
-    });
-    socket.emit('get_room_players', roomId);
-  } else {
-    alert('Please enter your name.');
-  }
-};
+    if (playerName.trim() !== '') {
+      socket.emit('join_room', { room_id: roomId, player_name: playerName });
+      socket.on('room_joined', (data) => {
+        setRoomId(data.room_id);
+        setShowNameInput(false);
+      });
+      socket.on('room_not_found', () => {
+        alert('Room not found. Please enter a valid room ID.');
+      });
+      socket.emit('get_room_players', roomId);
+    } else {
+      alert('Please enter your name.');
+    }
+  };
   
   const handleHostRoom = () => {
     if (playerName.trim() !== '') {
@@ -65,7 +55,6 @@ function App() {
     } else {
       alert('Please enter your name.');
     }
-    console.log(players)
   };
 
   const handleNameChange = (e) => {
@@ -84,7 +73,10 @@ function App() {
         />
       )}
       {roomId ? (
-        <Room roomId={roomId} playerName={playerName} players={players} />
+        <>
+          <Room roomId={roomId} playerName={playerName} players={players} />
+          <TriviaGame roomId={roomId} /> {/* Pass roomId to TriviaGame component */}
+        </>
       ) : (
         <div>
           <JoinRoom onJoin={handleJoinRoom} />

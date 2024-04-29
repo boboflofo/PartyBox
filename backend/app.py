@@ -11,6 +11,19 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 rooms = {}
 
+questions = [
+    {
+        "question": "What is the capital of France?",
+        "options": ["Paris", "London", "Berlin", "Madrid"],
+        "answer": "Paris"
+    },
+    {
+        "question": "Who wrote 'Romeo and Juliet'?",
+        "options": ["William Shakespeare", "Jane Austen", "Charles Dickens", "Mark Twain"],
+        "answer": "William Shakespeare"
+    }
+]
+
 @app.route('/')
 def serve_react():
     return send_from_directory('..', 'my-react-app/build/index.html')
@@ -63,8 +76,28 @@ def join_room(data):
     else:
         emit('invalid_data')
     print(rooms)
-    
 
+@socketio.on('start_game')
+def start_game(room_id):
+    question = random.choice(questions)
+    rooms[room_id] = {"question": question, "scores": {}}
+    emit('new_question', question, room=room_id)
+
+@socketio.on('answer')
+def handle_answer(data):
+    room_id = data['room_id']
+    answer = data['option']
+    question = rooms[room_id]["question"]
+    correct_answer = question['answer']
+
+    if answer == correct_answer:
+        player_sid = data['sid']
+        if player_sid not in rooms[room_id]["scores"]:
+            rooms[room_id]["scores"][player_sid] = 1
+        else:
+            rooms[room_id]["scores"][player_sid] += 1
+
+    emit('update_scores', rooms[room_id]["scores"], room=room_id)
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
