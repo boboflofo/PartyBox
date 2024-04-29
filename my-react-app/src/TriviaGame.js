@@ -3,8 +3,8 @@ import io from 'socket.io-client';
 
 const socket = io.connect('http://localhost:5000');
 
-const TriviaGame = ({ roomId, playerName }) => {
-  const [question, setQuestion] = useState('');
+const TriviaGame = ({ roomId }) => {
+  const [question, setQuestion] = useState(null);
   const [options, setOptions] = useState([]);
   const [answered, setAnswered] = useState(false);
   const [scores, setScores] = useState({});
@@ -32,7 +32,7 @@ const TriviaGame = ({ roomId, playerName }) => {
 
   const handleAnswer = (option) => {
     if (!answered) {
-      socket.emit('answer', { room_id: roomId, sid: socket.id, option }); // Include room_id in the answer data
+      socket.emit('answer', { room_id: roomId, sid: socket.id, option });
       setAnswered(true);
     }
   };
@@ -41,11 +41,11 @@ const TriviaGame = ({ roomId, playerName }) => {
     <div>
       <h2>Trivia Quiz</h2>
       {!question && (
-        <button onClick={handleStartGame}>Start Trivia Game</button>
+        <button onClick={handleStartGame}>Start Trivia Game {roomId}</button>
       )}
       {question && (
         <>
-          <p>{question}</p>
+          <p>{question.question}</p>
           <ul>
             {options.map((option, index) => (
               <li key={index} onClick={() => handleAnswer(option)}>
@@ -65,4 +65,4 @@ const TriviaGame = ({ roomId, playerName }) => {
   );
 };
 
-export default TriviaGame;
+export default TriviaGame
