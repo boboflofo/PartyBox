@@ -65,3 +65,4 @@
 3. internship meeting
 
 1. leet
+2 look up sample games
