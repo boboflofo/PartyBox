@@ -80,8 +80,13 @@ def join_room(data):
 @socketio.on('start_game')
 def start_game(room_id):
     question = random.choice(questions)
-    emit('new_question', question, room=room_id)
-    rooms[room_id] = {"question": question, "scores": {}}
+    print(question)
+    emit('new_question', question)
+    
+    if room_id in rooms:
+        rooms[room_id]["question"] = question
+    else:
+        rooms[room_id] = {"question": question, "scores": {}}
 
 @socketio.on('answer')
 def handle_answer(data):

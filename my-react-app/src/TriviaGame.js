@@ -11,7 +11,7 @@ const TriviaGame = ({ roomId, socket }) => {
 
   useEffect(() => {
     socket.on('new_question', (data) => {
-      console.log(data)
+      console.log(data.question)
       setQuestion(data.question);
       setOptions(data.options);
       setAnswered(false);
