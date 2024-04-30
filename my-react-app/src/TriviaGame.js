@@ -14,6 +14,7 @@ const TriviaGame = ({ roomId }) => {
       setQuestion(data.question);
       setOptions(data.options);
       setAnswered(false);
+      console.log("hi")
     });
 
     socket.on('update_scores', (roomScores) => {
@@ -28,6 +29,7 @@ const TriviaGame = ({ roomId }) => {
 
   const handleStartGame = () => {
     socket.emit('start_game', roomId);
+    console.log("hi")
   };
 
   const handleAnswer = (option) => {
@@ -45,7 +47,7 @@ const TriviaGame = ({ roomId }) => {
       )}
       {question && (
         <>
-          <p>{question.question}</p>
+          <p>{question}</p>
           <ul>
             {options.map((option, index) => (
               <li key={index} onClick={() => handleAnswer(option)}>
