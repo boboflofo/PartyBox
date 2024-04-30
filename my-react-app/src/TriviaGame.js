@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 
 const socket = io.connect('http://localhost:5000');
 
-const TriviaGame = ({ roomId }) => {
+const TriviaGame = ({ roomId, socket }) => {
   const [question, setQuestion] = useState(null);
   const [options, setOptions] = useState([]);
   const [answered, setAnswered] = useState(false);
@@ -11,6 +11,7 @@ const TriviaGame = ({ roomId }) => {
 
   useEffect(() => {
     socket.on('new_question', (data) => {
+      console.log(data)
       setQuestion(data.question);
       setOptions(data.options);
       setAnswered(false);
@@ -29,7 +30,6 @@ const TriviaGame = ({ roomId }) => {
 
   const handleStartGame = () => {
     socket.emit('start_game', roomId);
-    console.log("hi")
   };
 
   const handleAnswer = (option) => {
@@ -43,7 +43,7 @@ const TriviaGame = ({ roomId }) => {
     <div>
       <h2>Trivia Quiz</h2>
       {!question && (
-        <button onClick={handleStartGame}>Start Trivia Game {roomId}</button>
+        <button onClick={() => handleStartGame()}>Start Trivia Game {roomId}</button>
       )}
       {question && (
         <>

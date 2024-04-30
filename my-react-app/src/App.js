@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
 import JoinRoom from './JoinRoom';
 import HostRoom from './HostRoom';
 import Room from './Room';
 import TriviaGame from './TriviaGame'; // Import the TriviaGame component
-import io from 'socket.io-client';
 
 const socket = io.connect('http://localhost:5000');
 
@@ -75,7 +75,7 @@ function App() {
       {roomId ? (
         <>
           <Room roomId={roomId} playerName={playerName} players={players} />
-          <TriviaGame roomId={roomId} /> {/* Pass roomId to TriviaGame component */}
+          <TriviaGame roomId={roomId} socket={socket} /> {/* Pass socket connection to TriviaGame component */}
         </>
       ) : (
         <div>
