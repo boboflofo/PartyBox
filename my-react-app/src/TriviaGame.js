@@ -59,10 +59,10 @@ const TriviaGame = ({ roomId, socket }) => {
       )}
       <h3>Scores:</h3>
       <ul>
-        {Object.entries(scores).map(([sid, score]) => (
-          <li key={sid}>{sid}: {score}</li>
-        ))}
-      </ul>
+  {Object.entries(scores).map(([playerName, score]) => (
+    <li key={playerName}>{playerName}: {score}</li>  // Display playerName instead of sid
+  ))}
+</ul>
     </div>
   );
 };

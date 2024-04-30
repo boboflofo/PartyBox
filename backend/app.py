@@ -97,12 +97,16 @@ def handle_answer(data):
 
     if answer == correct_answer:
         player_sid = data['sid']
-        if player_sid not in rooms[room_id]["scores"]:
-            rooms[room_id]["scores"][player_sid] = 1
+        player_name = rooms[room_id][player_sid]  # Get player name from socket ID
+        if room_id in rooms and "scores" in rooms[room_id]:
+            if player_name in rooms[room_id]["scores"]:
+                rooms[room_id]["scores"][player_name] += 1  # Increment player's score
+            else:
+                rooms[room_id]["scores"][player_name] = 1  # Initialize player's score
         else:
-            rooms[room_id]["scores"][player_sid] += 1
+            rooms[room_id]["scores"] = {player_name: 1}  # Initialize scores if not present
 
-    emit('update_scores', rooms[room_id]["scores"], room=room_id)
+    emit('update_scores', rooms[room_id]["scores"])  # Emit scores with player names
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
