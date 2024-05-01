@@ -26,7 +26,7 @@ const TriviaGame = ({ roomId, socket }) => {
       socket.off('new_question');
       socket.off('update_scores');
     };
-  }, []);
+  }, [roomId]);
 
   const handleStartGame = () => {
     socket.emit('start_game', roomId);
