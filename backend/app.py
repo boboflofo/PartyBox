@@ -3,6 +3,7 @@ from flask_socketio import SocketIO, send, leave_room, join_room, emit
 from flask_cors import CORS
 import random
 from string import ascii_uppercase
+from threading import Timer
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "123456"
@@ -10,6 +11,8 @@ socketio = SocketIO(app,cors_allowed_origins="*")
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 rooms = {}
+
+timers = {}
 
 questions = [
     {
@@ -92,21 +95,51 @@ def start_game(room_id):
 def handle_answer(data):
     room_id = data['room_id']
     answer = data['option']
-    question = rooms[room_id]["question"]
-    correct_answer = question['answer']
+    
+    # Ensure room exists and has a question
+    if room_id in rooms and "question" in rooms[room_id]:
+        question = rooms[room_id]["question"]
+        correct_answer = question['answer']
 
-    if answer == correct_answer:
-        player_sid = data['sid']
-        player_name = rooms[room_id][player_sid]  # Get player name from socket ID
-        if room_id in rooms and "scores" in rooms[room_id]:
-            if player_name in rooms[room_id]["scores"]:
-                rooms[room_id]["scores"][player_name] += 1  # Increment player's score
+        # Check if the answer is correct
+        if answer == correct_answer:
+            player_sid = data['sid']
+            player_name = rooms[room_id][player_sid]  # Get player name from socket ID
+            
+            # Update scores
+            if "scores" in rooms[room_id]:
+                if player_name in rooms[room_id]["scores"]:
+                    rooms[room_id]["scores"][player_name] += 1  # Increment player's score
+                else:
+                    rooms[room_id]["scores"][player_name] = 1  # Initialize player's score
             else:
-                rooms[room_id]["scores"][player_name] = 1  # Initialize player's score
-        else:
-            rooms[room_id]["scores"] = {player_name: 1}  # Initialize scores if not present
+                rooms[room_id]["scores"] = {player_name: 1}  # Initialize scores if not present
 
-        emit('update_scores', rooms[room_id]["scores"], room=room_id)  # Emit scores with player names to specific room
+            # Emit updated scores to the specific room
+            emit('update_scores', rooms[room_id]["scores"])
+            stop_timer(room_id)
+
+@socketio.on('start_timer')
+def start_timer(room_id):
+    # Start the timer for the room
+    room_timer = Timer(30, game_finished, args=[room_id])  # 30 seconds timer
+    timers[room_id] = room_timer
+    room_timer.start()
+    emit('start_timer', room=room_id, broadcast=True)
+
+def stop_timer(room_id):
+    # Stop the timer for the room
+    if room_id in timers and timers[room_id]:
+        timers[room_id].cancel()
+        del timers[room_id]
+        emit('stop_timer', room=room_id)
+
+def game_finished(room_id):
+    # Calculate scores, find the winner, and announce it
+    if room_id in rooms:
+        # Example code to find the winner (you may need to adjust it based on your scoring system)
+        winner = max(rooms[room_id]["scores"], key=rooms[room_id]["scores"].get)
+        emit('game_finished', winner, room=room_id)
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)

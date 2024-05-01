@@ -1,21 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
-
-const socket = io.connect('http://localhost:5000');
 
 const TriviaGame = ({ roomId, socket }) => {
   const [question, setQuestion] = useState(null);
   const [options, setOptions] = useState([]);
   const [answered, setAnswered] = useState(false);
   const [scores, setScores] = useState({});
+  const [timer, setTimer] = useState(30);
+  const [timerRunning, setTimerRunning] = useState(false);
+
+  useEffect(() => {
+    let countdownInterval;
+
+    if (timerRunning) {
+      countdownInterval = setInterval(() => {
+        setTimer((prevTimer) => prevTimer - 1);
+      }, 1000);
+    }
+
+    return () => clearInterval(countdownInterval);
+  }, [timerRunning]);
+
+  useEffect(() => {
+    socket.on('start_timer', () => {
+      setTimerRunning(true);
+    });
+
+    socket.on('stop_timer', () => {
+      setTimerRunning(false);
+    });
+
+    socket.on('game_finished', (winner) => {
+      console.log('Game finished! Winner:', winner);
+    });
+
+    return () => {
+      socket.off('start_timer');
+      socket.off('stop_timer');
+      socket.off('game_finished');
+    };
+  }, []);
 
   useEffect(() => {
     socket.on('new_question', (data) => {
-      console.log(data.question)
       setQuestion(data.question);
       setOptions(data.options);
       setAnswered(false);
-      console.log("hi")
     });
 
     socket.on('update_scores', (roomScores) => {
@@ -30,6 +59,7 @@ const TriviaGame = ({ roomId, socket }) => {
 
   const handleStartGame = () => {
     socket.emit('start_game', roomId);
+    socket.emit('start_timer', roomId); // Emit start_timer event with roomId
   };
 
   const handleAnswer = (option) => {
@@ -43,10 +73,11 @@ const TriviaGame = ({ roomId, socket }) => {
     <div>
       <h2>Trivia Quiz</h2>
       {!question && (
-        <button onClick={() => handleStartGame()}>Start Trivia Game {roomId}</button>
+        <button onClick={handleStartGame}>Start Trivia Game {roomId}</button>
       )}
       {question && (
         <>
+          <p>Time left: {timer}</p>
           <p>{question}</p>
           <ul>
             {options.map((option, index) => (
@@ -59,12 +90,12 @@ const TriviaGame = ({ roomId, socket }) => {
       )}
       <h3>Scores:</h3>
       <ul>
-  {Object.entries(scores).map(([playerName, score]) => (
-    <li key={playerName}>{playerName}: {score}</li>  // Display playerName instead of sid
-  ))}
-</ul>
+        {Object.entries(scores).map(([playerName, score]) => (
+          <li key={playerName}>{playerName}: {score}</li>
+        ))}
+      </ul>
     </div>
   );
 };
 
-export default TriviaGame
+export default TriviaGame;
