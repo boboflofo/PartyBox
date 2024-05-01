@@ -106,7 +106,7 @@ def handle_answer(data):
         else:
             rooms[room_id]["scores"] = {player_name: 1}  # Initialize scores if not present
 
-    emit('update_scores', rooms[room_id]["scores"])  # Emit scores with player names to specific room
+        emit('update_scores', rooms[room_id]["scores"], room=room_id)  # Emit scores with player names to specific room
 
 if __name__ == "__main__":
     socketio.run(app, debug=True)
