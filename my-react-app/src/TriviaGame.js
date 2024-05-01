@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import io from 'socket.io-client';
 
 const TriviaGame = ({ roomId, socket }) => {
   const [question, setQuestion] = useState(null);
@@ -6,60 +7,60 @@ const TriviaGame = ({ roomId, socket }) => {
   const [answered, setAnswered] = useState(false);
   const [scores, setScores] = useState({});
   const [timer, setTimer] = useState(30);
-  const [timerRunning, setTimerRunning] = useState(false);
-
-  useEffect(() => {
-    let countdownInterval;
-
-    if (timerRunning) {
-      countdownInterval = setInterval(() => {
-        setTimer((prevTimer) => prevTimer - 1);
-      }, 1000);
-    }
-
-    return () => clearInterval(countdownInterval);
-  }, [timerRunning]);
+  const [gameFinished, setGameFinished] = useState(false);
+  const [winner, setWinner] = useState(null); // State to hold the winner
 
   useEffect(() => {
     socket.on('start_timer', () => {
-      setTimerRunning(true);
+      const startTime = Date.now();
+      const interval = setInterval(() => {
+        const remainingTime = Math.max(30 - Math.floor((Date.now() - startTime) / 1000), 0);
+        setTimer(remainingTime);
+        if (remainingTime === 0) {
+          clearInterval(interval);
+        }
+      }, 1000);
     });
-
+  
     socket.on('stop_timer', () => {
-      setTimerRunning(false);
+      // Implement logic to stop the timer if needed
     });
-
-    socket.on('game_finished', (winner) => {
-      console.log('Game finished! Winner:', winner);
+  
+    socket.on('game_finished', (gameWinner) => {
+      console.log('Game finished! Winner:', gameWinner);
+      setGameFinished(true);
+      setWinner(gameWinner); // Set the winner when the game finishes
     });
-
-    return () => {
-      socket.off('start_timer');
-      socket.off('stop_timer');
-      socket.off('game_finished');
-    };
-  }, []);
-
-  useEffect(() => {
+  
     socket.on('new_question', (data) => {
       setQuestion(data.question);
       setOptions(data.options);
       setAnswered(false);
+      setGameFinished(false);
+      setWinner(null); // Reset winner when new question is received
     });
-
+  
     socket.on('update_scores', (roomScores) => {
       setScores(roomScores);
     });
-
+  
+    socket.on('disable_answer', () => {
+      setAnswered(true); // Disable answering when receiving disable_answer event
+    });
+  
     return () => {
+      socket.off('start_timer');
+      socket.off('stop_timer');
+      socket.off('game_finished');
       socket.off('new_question');
       socket.off('update_scores');
+      socket.off('disable_answer');
     };
-  }, [roomId]);
+  }, []);
 
   const handleStartGame = () => {
     socket.emit('start_game', roomId);
-    socket.emit('start_timer', roomId); // Emit start_timer event with roomId
+    socket.emit('start_timer', roomId);
   };
 
   const handleAnswer = (option) => {
@@ -67,6 +68,8 @@ const TriviaGame = ({ roomId, socket }) => {
       socket.emit('answer', { room_id: roomId, sid: socket.id, option });
       setAnswered(true);
     }
+    // Always request for a new question after answering
+    socket.emit('start_game', roomId);
   };
 
   return (
@@ -81,7 +84,7 @@ const TriviaGame = ({ roomId, socket }) => {
           <p>{question}</p>
           <ul>
             {options.map((option, index) => (
-              <li key={index} onClick={() => handleAnswer(option)}>
+              <li key={index} onClick={() => handleAnswer(option)} style={{ cursor: answered || gameFinished ? 'not-allowed' : 'pointer' }}>
                 {option}
               </li>
             ))}
@@ -94,6 +97,9 @@ const TriviaGame = ({ roomId, socket }) => {
           <li key={playerName}>{playerName}: {score}</li>
         ))}
       </ul>
+      {gameFinished && (
+        <p>Winner: {winner}</p>
+      )}
     </div>
   );
 };
