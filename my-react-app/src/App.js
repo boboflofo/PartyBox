@@ -3,7 +3,8 @@ import io from 'socket.io-client';
 import JoinRoom from './JoinRoom';
 import HostRoom from './HostRoom';
 import Room from './Room';
-import TriviaGame from './TriviaGame'; // Import the TriviaGame component
+import TriviaGame from './TriviaGame'; 
+import './App.css';
 
 const socket = io.connect('http://localhost:5000');
 

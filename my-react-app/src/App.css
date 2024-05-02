@@ -1,3 +1,8 @@
+:root {
+  --primary-color: #ff6b6b; /* Bright red */
+  --secondary-color: #5f27cd; /* Deep purple */
+}
+
 .button {
   background-color: #007bff;
   color: white;
@@ -10,4 +15,10 @@
 
 .button:hover {
   transform: scale(1.1); /* Scale up by 10% on hover */
+}
+
+.App {
+  background-image: url('background.jpg');
+  background-size: cover;
+  background-position: center;
 }
