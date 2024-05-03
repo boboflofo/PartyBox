@@ -6,9 +6,9 @@ function HostRoom({ onHost }) {
   };
 
   return (
-    <div>
+    <div className="host-room-container">
       <h2>Host Room</h2>
-      <button onClick={handleHost}>Host</button>
+      <button className="host-button" onClick={handleHost}>Host</button>
     </div>
   );
 }

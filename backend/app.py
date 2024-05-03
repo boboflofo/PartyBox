@@ -64,7 +64,7 @@ questions = [
         "options": ["Neil Armstrong", "Buzz Aldrin", "Yuri Gagarin", "Alan Shepard"],
         "answer": "Neil Armstrong"
     }
-    # Add more questions as needed
+  
 ]
 
 def generate_unique_code(length):
@@ -109,10 +109,10 @@ def start_game(room_id):
     if room_id in rooms:
         rooms[room_id]["question"] = question
         if room_id not in timers:
-            start_timer(room_id)  # Start the timer only if it hasn't been started before
+            start_timer(room_id)  
     else:
         rooms[room_id] = {"question": question, "scores": {}}
-        start_timer(room_id)  # Always start the timer for a new room
+        start_timer(room_id)
 
 @socketio.on('answer')
 def handle_answer(data):
@@ -135,59 +135,54 @@ def handle_answer(data):
             else:
                 rooms[room_id]["scores"] = {player_name: 1}
         else:
-            # Penalize incorrect answers (optional)
             if "scores" in rooms[room_id]:
                 if player_name in rooms[room_id]["scores"]:
-                    rooms[room_id]["scores"][player_name] -= 1  # Decrease score for incorrect answer
+                    rooms[room_id]["scores"][player_name] -= 1  
                 else:
-                    rooms[room_id]["scores"][player_name] = -1  # Set score to -1 for incorrect answer
+                    rooms[room_id]["scores"][player_name] = -1  
             else:
-                rooms[room_id]["scores"] = {player_name: -1}  # Set score to -1 for incorrect answer
+                rooms[room_id]["scores"] = {player_name: -1}  
         print(rooms[room_id]["scores"])
         emit('update_scores', rooms[room_id]["scores"])
 
 @socketio.on('start_timer')
 def start_timer(room_id):
     if room_id not in timers:
-        print("Starting timer for room:", room_id)  # Debugging print
+        print("Starting timer for room:", room_id)  
         room_timer = Timer(30, game_finished, args=[room_id])
         timers[room_id] = room_timer
         room_timer.start()
         emit('start_timer', broadcast=True)
     else:
-        # Restart the timer if it already exists
-        print("Restarting timer for room:", room_id)  # Debugging print
-        timers[room_id].cancel()  # Cancel the existing timer
+        print("Restarting timer for room:", room_id)  
+        timers[room_id].cancel()  
         room_timer = Timer(30, game_finished, args=[room_id])
         timers[room_id] = room_timer
         room_timer.start()
 
 def stop_timer(room_id):
     if room_id in timers:
-        print("Stopping timer for room:", room_id)  # Debugging print
+        print("Stopping timer for room:", room_id)  
         timers[room_id].cancel()
         del timers[room_id]
         emit('stop_timer', broadcast=True)
     else:
-        print("Timer not found for room:", room_id)  # Debugging print
+        print("Timer not found for room:", room_id)  
 
 @socketio.on('game_finished')
 def game_finished(room_id):
-    print("Game finished for room:", room_id)  # Debugging print
+    print("Game finished for room:", room_id)  
     if room_id in rooms:
         if "scores" in rooms[room_id] and rooms[room_id]["scores"]:
             winner = max(rooms[room_id]["scores"], key=rooms[room_id]["scores"].get)
             emit('game_finished', winner, room=room_id)
         else:
-            emit('game_finished', "No winner", room=room_id)  # Emit a message indicating no winner
+            emit('game_finished', "No winner", room=room_id)  
+
+        emit('stop_timer', room=room_id)  
         
-        # Stop the timer by emitting 'stop_timer' event
-        emit('stop_timer', room=room_id)  # Emit stop_timer event directly here
-        
-        # Remove the question from the room
         del rooms[room_id]["question"]
         
-        # Notify clients to disable answering
         emit('disable_answer', room=room_id)
 
 if __name__ == "__main__":

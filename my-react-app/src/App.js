@@ -3,8 +3,8 @@ import io from 'socket.io-client';
 import JoinRoom from './JoinRoom';
 import HostRoom from './HostRoom';
 import Room from './Room';
-import TriviaGame from './TriviaGame'; 
-import './App.css';
+import TriviaGame from './TriviaGame';
+import './App.css'; 
 
 const socket = io.connect('http://localhost:5000');
 
@@ -21,9 +21,9 @@ function App() {
         setPlayers(playerNames);
       }
     };
-  
+
     socket.on('room_players_update', handleRoomPlayersUpdate);
-  
+
     return () => {
       socket.off('room_players_update', handleRoomPlayersUpdate);
     };
@@ -44,14 +44,14 @@ function App() {
       alert('Please enter your name.');
     }
   };
-  
+
   const handleHostRoom = () => {
     if (playerName.trim() !== '') {
       socket.emit('host_room', { player_name: playerName });
       socket.on('room_created', (data) => {
         setRoomId(data.room_id);
         setShowNameInput(false);
-        setPlayers([playerName]); 
+        setPlayers([playerName]);
       });
     } else {
       alert('Please enter your name.');
@@ -67,6 +67,7 @@ function App() {
       <h1>PartyBox</h1>
       {showNameInput && (
         <input
+          className="name-input"
           type="text"
           value={playerName}
           onChange={handleNameChange}
@@ -76,12 +77,14 @@ function App() {
       {roomId ? (
         <>
           <Room roomId={roomId} playerName={playerName} players={players} />
-          <TriviaGame roomId={roomId} socket={socket} /> {/* Pass socket connection to TriviaGame component */}
+          <TriviaGame roomId={roomId} socket={socket} />
         </>
       ) : (
-        <div>
-          <JoinRoom onJoin={handleJoinRoom} />
-          <HostRoom onHost={handleHostRoom} />
+        <div className="screen">
+          <div>
+            <JoinRoom onJoin={handleJoinRoom} />
+            <HostRoom onHost={handleHostRoom} />
+          </div>
         </div>
       )}
     </div>

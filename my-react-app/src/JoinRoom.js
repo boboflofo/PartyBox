@@ -12,15 +12,16 @@ export default function JoinRoom({ onJoin }) {
   };
 
   return (
-    <div>
+    <div className="join-room-container">
       <h2>Join Room</h2>
       <input
         type="text"
         value={roomId}
         onChange={handleChange}
         placeholder="Enter Room ID"
+        className="room-input"
       />
-      <button onClick={handleJoin}>Join</button>
+      <button className="join-button" onClick={handleJoin}>Join</button>
     </div>
   );
 }

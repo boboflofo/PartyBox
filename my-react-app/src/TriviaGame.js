@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
 
 const TriviaGame = ({ roomId, socket }) => {
   const [question, setQuestion] = useState(null);
@@ -8,7 +7,7 @@ const TriviaGame = ({ roomId, socket }) => {
   const [scores, setScores] = useState({});
   const [timer, setTimer] = useState(30);
   const [gameFinished, setGameFinished] = useState(false);
-  const [winner, setWinner] = useState(null); // State to hold the winner
+  const [winner, setWinner] = useState(null); 
 
   useEffect(() => {
     socket.on('start_timer', () => {
@@ -23,13 +22,13 @@ const TriviaGame = ({ roomId, socket }) => {
     });
   
     socket.on('stop_timer', () => {
-      // Implement logic to stop the timer if needed
+    
     });
   
     socket.on('game_finished', (gameWinner) => {
       console.log('Game finished! Winner:', gameWinner);
       setGameFinished(true);
-      setWinner(gameWinner); // Set the winner when the game finishes
+      setWinner(gameWinner); 
     });
   
     socket.on('new_question', (data) => {
@@ -37,7 +36,7 @@ const TriviaGame = ({ roomId, socket }) => {
       setOptions(data.options);
       setAnswered(false);
       setGameFinished(false);
-      setWinner(null); // Reset winner when new question is received
+      setWinner(null); 
     });
   
     socket.on('update_scores', (roomScores) => {
@@ -45,7 +44,7 @@ const TriviaGame = ({ roomId, socket }) => {
     });
   
     socket.on('disable_answer', () => {
-      setAnswered(true); // Disable answering when receiving disable_answer event
+      setAnswered(true); 
     });
   
     return () => {
@@ -68,37 +67,40 @@ const TriviaGame = ({ roomId, socket }) => {
       socket.emit('answer', { room_id: roomId, sid: socket.id, option });
       setAnswered(true);
     }
-    // Always request for a new question after answering
     socket.emit('start_game', roomId);
   };
 
   return (
-    <div>
-      <h2>Trivia Quiz</h2>
+    <div className="trivia-game-container">
+      <h2 className="game-title">Trivia Quiz</h2>
       {!question && (
-        <button onClick={handleStartGame}>Start Trivia Game {roomId}</button>
+        <button className="start-button" onClick={handleStartGame}>Start Trivia Game</button>
       )}
       {question && (
         <>
-          <p>Time left: {timer}</p>
-          <p>{question}</p>
-          <ul>
+          <p className="timer">Time left: {timer}</p>
+          <p className="question">{question}</p>
+          <ul className="options-list">
             {options.map((option, index) => (
-              <li key={index} onClick={() => handleAnswer(option)} style={{ cursor: answered || gameFinished ? 'not-allowed' : 'pointer' }}>
+              <li
+                key={index}
+                onClick={() => handleAnswer(option)}
+                className={`option ${answered || gameFinished ? 'disabled' : ''}`}
+              >
                 {option}
               </li>
             ))}
           </ul>
         </>
       )}
-      <h3>Scores:</h3>
-      <ul>
+      <h3 className="scores-title">Scores:</h3>
+      <ul className="scores-list">
         {Object.entries(scores).map(([playerName, score]) => (
-          <li key={playerName}>{playerName}: {score}</li>
+          <li key={playerName} className="score">{playerName}: {score}</li>
         ))}
       </ul>
       {gameFinished && (
-        <p>Winner: {winner}</p>
+        <p className="winner-message">Winner: {winner}</p>
       )}
     </div>
   );
