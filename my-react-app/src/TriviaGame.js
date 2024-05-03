@@ -38,6 +38,7 @@ const TriviaGame = ({ roomId, socket }) => {
       setGameFinished(false);
       setWinner(null); 
     });
+
   
     socket.on('update_scores', (roomScores) => {
       setScores(roomScores);
@@ -55,7 +56,7 @@ const TriviaGame = ({ roomId, socket }) => {
       socket.off('update_scores');
       socket.off('disable_answer');
     };
-  }, []);
+  }, [roomId]);
 
   const handleStartGame = () => {
     socket.emit('start_game', roomId);
