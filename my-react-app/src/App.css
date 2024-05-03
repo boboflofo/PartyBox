@@ -3,31 +3,44 @@
   --secondary-color: #5f27cd; 
 }
 
-button {
+body {
+  background: linear-gradient(to bottom right, #ff6b6b, #5f27cd);
+}
+
+h1 {
+  font-size: 36px;
+  margin-bottom: 20px;
+  color: #5f27cd; /* Deep purple */
+}
+
+.button {
   background-color: #007bff;
   color: white;
   border: none;
   padding: 10px 20px;
   font-size: 16px;
   cursor: pointer;
+  border-radius: 5px;
   transition: transform 0.2s ease;
 }
 
 .button:hover {
   transform: scale(1.1);
-  transition: transform 0.2s ease;
 }
 
 .button:active {
   transform: scale(0.95);
 }
-
 .App {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh; 
+  height: 100vh;
+  background-color: #e1bee7; 
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); 
 }
 
 .name-input {
@@ -38,15 +51,21 @@ button {
   border-radius: 5px;
   width: 250px;
   text-align: center;
+  background-color: #fff; 
 }
 
 .name-input:focus {
   outline: none;
-  border-color: #5f27cd; 
+  border-color: #5f27cd;
 }
 
 .screen {
-  transition: opacity 0.3s ease;
+  margin-top: 20px;
+  padding: 20px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  background-color: #fff;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 }
 
 .screen-hidden {
@@ -67,11 +86,12 @@ button {
 }
 
 .trivia-game-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  background-color: #f5f5f5;
+  border-radius: 10px;
   padding: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  max-width: 90%; 
+  margin: auto; 
 }
 
 .trivia-game-container button {
